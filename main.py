@@ -27,9 +27,12 @@ class Snake:
     def move(self):
         if self.state == "UP":
             self.headY -= PIXELS
-
         elif self.state == "DOWN":
-            self.headY
+            self.headY += PIXELS
+        elif self.state == "LEFT":
+            self.headX -= PIXELS
+        elif self.state == "RIGHT":
+            self.headX += PIXELS
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, (self.headX, self.headY, PIXELS, PIXELS))
@@ -61,6 +64,13 @@ class Background:
                     counter += 1
 
 
+class Colission:
+
+    def between_snake_and_apple(self, snake, apple):
+        distance = math.sqrt(math.pow((snake.headX - apple.posX), 2) + math.pow((snake.headY - apple.posY), 2))
+        return distance < PIXELS
+
+
 if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -70,6 +80,7 @@ if __name__ == '__main__':
     apple = Apple()
     snake = Snake()
     background = Background()
+    collision = Colission()
 
     # Main loop
     while True:
@@ -80,9 +91,23 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
-
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    snake.state = "UP"
+                if event.key == pygame.K_DOWN:
+                    snake.state = "DOWN"
+                if event.key == pygame.K_LEFT:
+                    snake.state = "LEFT"
+                if event.key == pygame.K_RIGHT:
+                    snake.state = "RIGHT"
                 if event.key == pygame.K_q:
                     sys.exit()
 
+        if collision.between_snake_and_apple(snake, apple):
+            apple.spawn()
+            # Increase the length of the snake
+            # Increase the score
+
+        pygame.time.delay(80)
+        snake.move()
         pygame.display.update()
