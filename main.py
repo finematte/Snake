@@ -69,8 +69,16 @@ class Apple:
         self.spawn()
 
     def spawn(self):
-        self.posX = random.randrange(0, WIDTH, PIXELS)
-        self.posY = random.randrange(0, HEIGHT, PIXELS)
+        positionX = random.randrange(0, WIDTH, PIXELS)
+        positionY = random.randrange(0, HEIGHT, PIXELS)
+
+        # Making sure that apple does not spawn inside the snake
+        while screen.get_at((positionX, positionY)) == BLUE:
+            positionX = random.randrange(0, WIDTH, PIXELS)
+            positionY = random.randrange(0, HEIGHT, PIXELS)
+
+        self.posX = positionX
+        self.posY = positionY
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, (self.posX, self.posY, PIXELS, PIXELS))
