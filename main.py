@@ -15,6 +15,7 @@ BG1 = (156, 210, 54)
 BG2 = (147, 203, 57)
 RED = (255, 0, 0)
 BLUE = (0, 0, 50)
+BLACK = (0, 0, 0)
 
 
 class Snake:
@@ -89,7 +90,6 @@ class Background:
 
 
 class Collision:
-
     def between_snake_and_apple(self, snake, apple):
         distance = math.sqrt(math.pow((snake.headX - apple.posX), 2) + math.pow((snake.headY - apple.posY), 2))
         return distance < PIXELS
@@ -117,6 +117,22 @@ class Body:
         pygame.draw.rect(surface, self.color, (self.posX, self.posY, PIXELS, PIXELS))
 
 
+class Score:
+    def __init__(self):
+        self.points = 0
+        self.font = pygame.font.SysFont('monospace', 30, bold=False)
+
+    def increase(self):
+        self.points += 1
+
+    def reset(self):
+        self.points = 0
+
+    def show_score(self, surface):
+        label = self.font.render('Score: ' + str(self.points), True, BLACK)
+        surface.blit(label, (5, 5))
+
+
 if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -127,6 +143,7 @@ if __name__ == '__main__':
     snake = Snake()
     background = Background()
     collision = Collision()
+    score = Score()
 
     # Updating screen
     clock = pygame.time.Clock()
@@ -138,6 +155,7 @@ if __name__ == '__main__':
         background.draw(screen)
         apple.draw(screen)
         snake.draw(screen)
+        score.show_score(screen)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -146,14 +164,18 @@ if __name__ == '__main__':
                 if collision.between_snake_and_apple(snake, apple):
                     apple.spawn()
                     snake.add_body()
-                snake.move_body()
-                snake.move_head()
+                    score.increase()
+                if snake.state != "STOP":
+                    snake.move_body()
+                    snake.move_head()
                 if collision.between_snake_and_walls(snake):
                     snake.die()
                     apple.spawn()
+                    score.reset()
                 if collision.between_head_and_body(snake):
                     snake.die()
                     apple.spawn()
+                    score.reset()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     if snake.state != "DOWN":
@@ -167,6 +189,8 @@ if __name__ == '__main__':
                 if event.key == pygame.K_RIGHT:
                     if snake.state != "LEFT":
                         snake.state = "RIGHT"
+                if event.key == pygame.K_p:
+                    snake.state = "STOP"
                 if event.key == pygame.K_q:
                     sys.exit()
 
