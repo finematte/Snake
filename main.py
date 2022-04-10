@@ -57,6 +57,7 @@ class Snake:
                 body.draw(surface)
 
     def die(self):
+        time.sleep(1.75)
         self.headX = random.randrange(0, WIDTH, PIXELS)
         self.headY = random.randrange(0, HEIGHT, PIXELS)
         self.bodies.clear()
